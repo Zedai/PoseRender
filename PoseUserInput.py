@@ -13,6 +13,21 @@ stop = False
 
 def receive(sock):
     while True:
+        fragments = []
+        while True:
+             packet = s.recv(1000)
+             print(packet)
+             if packet[-4:] == b'done':
+                 fragments.append(packet[:-4])
+                 print("got done")
+                 break
+             if not packet: break
+             fragments.append(packet)
+
+             if packet[-5:] == b'close':
+                 print("Unity Closed")
+                 sys.exit()
+
         if stop:
             print("Exiting Receiver Thread")
             sock.close()
@@ -37,8 +52,18 @@ if __name__ == "__main__":
     print("Connected to Unity")
 
     #    s.send(b"startXpos:12 Ypos:35 Zpos:25 Xrot:"+bytes(str(12), 'utf-8') + b" Yrot:2 Zrot:5 Wrot:1 fov:45end")
-    for i in range(100000):
+    while True:
         try:
+            xpos = input("X Position:")
+            ypos = input("Y Position:")
+            zpos = input("Z Position:")
+            xrot = input("X Rotation:")
+            yrot = input("Y Rotation:")
+            zrot = input("Z Rotation:")
+            wrot = input("W Rotation:")
+            fov = input("FOV:")
+
+        
             print("startXpos:12 Ypos:35 Zpos:25 Xrot:"+str(i) + " Yrot:2 Zrot:5 Wrot:1 fov:45end")
             s.send(b"startXpos:12 Ypos:35 Zpos:25 Xrot:"+bytes(str(i), 'utf-8') + b" Yrot:2 Zrot:5 Wrot:1 fov:45end")
             time.sleep(1)
@@ -55,19 +80,19 @@ if __name__ == "__main__":
     # time.sleep(1)
 
     fragments = []
-    # while True:
-    #     packet = s.recv(1000)
-    #     print(packet)
-    #     if packet[-4:] == b'done':
-    #         fragments.append(packet[:-4])
-    #         print("got done")
-    #         break
-    #     if not packet: break
-    #     fragments.append(packet)
+    while True:
+         packet = s.recv(1000)
+         print(packet)
+         if packet[-4:] == b'done':
+             fragments.append(packet[:-4])
+             print("got done")
+             break
+         if not packet: break
+         fragments.append(packet)
 
-    #     if packet[-5:] == b'close':
-    #         print("Unity Closed")
-    #         sys.exit()
+         if packet[-5:] == b'close':
+             print("Unity Closed")
+             sys.exit()
 
     # s.send(b"startXpos:12 Ypos:35 Zpos:25 Xrot:12 Yrot:2 Zrot:5 Wrot:1 fov:45end")
 
@@ -75,4 +100,5 @@ if __name__ == "__main__":
     # b = io.BytesIO(final)
     # image = Image.open(b)
     # plt.imshow(np.asarray(image))
+
 

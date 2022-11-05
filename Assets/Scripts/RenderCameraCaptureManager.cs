@@ -21,7 +21,7 @@ public class RenderCameraCaptureManager : MonoBehaviour
     byte[] bytefield;
     bool threadSentinel;
     String currentMessage;
-    bool messageReady, updateParams, postRender;
+    static bool messageReady, updateParams, postRender;
     Vector3 pos;
     Quaternion rot;
     float fov;
@@ -64,10 +64,14 @@ public class RenderCameraCaptureManager : MonoBehaviour
         // print(cam.transform.rotation.eulerAngles);
         // print(new Quaternion(1, 2, 3, 1).eulerAngles);
         // print("running");
+
+        //print(Time.deltaTime);
+       // print(updateParams);
         if(updateParams){
             cam.transform.position = pos;
             cam.transform.rotation = rot;
             cam.fieldOfView = fov;
+            print("params updated");
         }
     }
 
@@ -114,12 +118,12 @@ public class RenderCameraCaptureManager : MonoBehaviour
         //#int count = 1;        
         while(threadSentinel)
         {
-        //     if(postRender){
-        //         print("sending image to python");
-        //         socket.Send(bytefield);
-        //         socket.Send(Encoding.ASCII.GetBytes("done"));
-        //         postRender = false;
-        //     }
+             if(postRender){
+                 print("sending image to python");
+                 socket.Send(bytefield);
+                 socket.Send(Encoding.ASCII.GetBytes("done"));
+                 postRender = false;
+             }
 
             //Texture2D t2D = new Texture2D(camWidth, camHeight, TextureFormat.RGB24, false);
 
@@ -153,10 +157,11 @@ public class RenderCameraCaptureManager : MonoBehaviour
                                 float.Parse(currentMessage.Substring(WrotI + 5, fovI - WrotI - 5).Trim()));
                 fov = float.Parse(currentMessage.Substring(fovI + 4).Trim());
                 // print(currentMessage.Substring(currentMessage.IndexOf("Xpos:") + 5, currentMessage.IndexOf("Ypos:")-5).Trim());
-                // print(currentMessage);
+                print(currentMessage);
                 messageReady = false;
                 currentMessage = null;
                 updateParams = true;
+               //     print(updateParams);
                 // print("hi");
             }else{
                 if(currentMessage is null && message_snippet.Contains("start")){

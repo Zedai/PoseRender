@@ -21,7 +21,7 @@ public class RenderCameraCaptureManager : MonoBehaviour
     byte[] bytefield;
     bool threadSentinel;
     String currentMessage;
-    static bool messageReady, updateParams, postRender;
+    bool messageReady, updateParams, postRender, paramsUpdated;
     Vector3 pos;
     Quaternion rot;
     float fov;
@@ -72,14 +72,16 @@ public class RenderCameraCaptureManager : MonoBehaviour
             cam.transform.rotation = rot;
             cam.fieldOfView = fov;
             print("params updated");
+            updateParams = false;
+            paramsUpdated = true;
         }
     }
 
     void LateUpdate(){
         bytefield = GetRenderBytes();
 
-        if(updateParams){
-            updateParams = false;
+        if(paramsUpdated){
+            paramsUpdated = false;
             postRender = true;
         }
     }
@@ -114,9 +116,10 @@ public class RenderCameraCaptureManager : MonoBehaviour
             // You could also use server.AcceptSocket() here.
             socket = server.AcceptSocket();
                 Console.WriteLine("Connection accepted.");      
+            socket.ReceiveTimeout = 1000;
 
-        //#int count = 1;        
-        while(threadSentinel)
+            //#int count = 1;        
+            while (threadSentinel)
         {
              if(postRender){
                  print("sending image to python");
@@ -135,10 +138,8 @@ public class RenderCameraCaptureManager : MonoBehaviour
             // for(int i = 0; i<1024;i++){
                 // recv_bytes[i]=1;
             // }
-            socket.Receive(recv_bytes);
-            //print(string.Join(", ", recv_bytes));
-            String message_snippet = Encoding.ASCII.GetString(recv_bytes);
-
+             //   print(messageReady);
+              //  print(currentMessage);
             if(messageReady){
                 int XposI = currentMessage.IndexOf("Xpos:");
                 int YposI= currentMessage.IndexOf("Ypos:");
@@ -164,6 +165,19 @@ public class RenderCameraCaptureManager : MonoBehaviour
                //     print(updateParams);
                 // print("hi");
             }else{
+
+                    try
+                    {
+                        socket.Receive(recv_bytes);
+                    }         catch (SocketException e)
+         {
+             //print("nodata");
+         }
+
+                    //print(string.Join(", ", recv_bytes));
+                    String message_snippet = Encoding.ASCII.GetString(recv_bytes);
+            //print(message_snippet);
+
                 if(currentMessage is null && message_snippet.Contains("start")){
                     if(message_snippet.Contains("end")){
                         // print(message_snippet);
@@ -172,6 +186,7 @@ public class RenderCameraCaptureManager : MonoBehaviour
                         }
                         currentMessage = message_snippet.Substring(message_snippet.IndexOf("start") + 5, message_snippet.IndexOf("end") - message_snippet.IndexOf("start") - 5).Trim();
                         messageReady = true;
+                            print(messageReady);
                     }
                     else{
                         currentMessage = message_snippet.Substring(message_snippet.IndexOf("start") + 5).Trim();

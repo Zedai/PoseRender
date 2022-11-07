@@ -3,6 +3,7 @@ import socket
 import time
 import matplotlib.pyplot as plt
 from PIL import Image
+import PIL
 import io
 import numpy as np
 import sys
@@ -18,11 +19,15 @@ def receive(sock):
              if stop:
                  break
 
-             packet = s.recv(1000)
-             print(packet)
+             packet = b''
+             try:
+                 packet = s.recv(1000)
+             except ConnectionAbortedError:
+                 print("Connection Aborted")
+                 #print(packet)
              if packet[-4:] == b'done':
                  fragments.append(packet[:-4])
-                 print("got done")
+                 #print("got done")
                  break
             # if not packet: break
              fragments.append(packet)
@@ -33,9 +38,13 @@ def receive(sock):
               
         final = b"".join(fragments)
         b = io.BytesIO(final)
-        image = Image.open(b)
+        try:
+            image = Image.open(b)
+            image.show()
+        except PIL.UnidentifiedImageError:
+            print("Received malformed image data (or maybe the socket connection was aborted?)")
         #plt.imshow(np.asarray(image))
-        image.show()
+        
 
         if stop:
             print("Exiting Receiver Thread")
@@ -79,7 +88,7 @@ if __name__ == "__main__":
             s.send(b"startXpos:"+bytes(str(xpos), 'utf-8') + b" Ypos:"+bytes(str(ypos), 'utf-8') + b" Zpos:"+bytes(str(zpos), 'utf-8') + b" Xrot:"+bytes(str(xrot), 'utf-8') + b" Yrot:"+bytes(str(yrot), 'utf-8') + b" Zrot:"+bytes(str(zrot), 'utf-8') + b" Wrot:"+bytes(str(wrot), 'utf-8') + b" fov:"+bytes(str(fov), 'utf-8') + b"end")
             #time.sleep(1)
         except KeyboardInterrupt:
-            print("Exiting Main Thread")
+            print("\nKeyboard Interrupt Detected: Exiting Main Thread")
             stop = True
             #print("threads successfully closed")
             break

@@ -110,12 +110,12 @@ public class RenderCameraCaptureManager : MonoBehaviour
         String data = null;
         // Enter the listening loop.
 
-            Console.Write("Waiting for a connection... ");
+            print("Waiting for a connection... ");
 
             // Perform a blocking call to accept requests.
             // You could also use server.AcceptSocket() here.
             socket = server.AcceptSocket();
-                Console.WriteLine("Connection accepted.");      
+                print("Connection accepted.");      
             socket.ReceiveTimeout = 1000;
 
             //#int count = 1;        
@@ -186,7 +186,7 @@ public class RenderCameraCaptureManager : MonoBehaviour
                         }
                         currentMessage = message_snippet.Substring(message_snippet.IndexOf("start") + 5, message_snippet.IndexOf("end") - message_snippet.IndexOf("start") - 5).Trim();
                         messageReady = true;
-                            print(messageReady);
+                           // print(messageReady);
                     }
                     else{
                         currentMessage = message_snippet.Substring(message_snippet.IndexOf("start") + 5).Trim();

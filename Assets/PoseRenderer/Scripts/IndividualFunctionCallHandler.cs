@@ -148,9 +148,9 @@ public class IndividualFunctionCallHandler : MonoBehaviour
                     int ZrotI = currentMessage.IndexOf("Zrot:");
                     int WrotI = currentMessage.IndexOf("Wrot:");
                     int fovI = currentMessage.IndexOf("fov:");
-                    pos = new Vector3(Int32.Parse(currentMessage.Substring(XposI + 5, YposI - XposI - 5).Trim()),
-                                    Int32.Parse(currentMessage.Substring(YposI + 5, ZposI - YposI - 5).Trim()),
-                                    Int32.Parse(currentMessage.Substring(ZposI + 5, XrotI - ZposI - 5).Trim()));
+                    pos = new Vector3(float.Parse(currentMessage.Substring(XposI + 5, YposI - XposI - 5).Trim()),
+                                    float.Parse(currentMessage.Substring(YposI + 5, ZposI - YposI - 5).Trim()),
+                                    float.Parse(currentMessage.Substring(ZposI + 5, XrotI - ZposI - 5).Trim()));
                     rot = new Quaternion(float.Parse(currentMessage.Substring(XrotI + 5, YrotI - XrotI - 5).Trim()),
                                     float.Parse(currentMessage.Substring(YrotI + 5, ZrotI - YrotI - 5).Trim()),
                                     float.Parse(currentMessage.Substring(ZrotI + 5, WrotI - ZrotI - 5).Trim()),
